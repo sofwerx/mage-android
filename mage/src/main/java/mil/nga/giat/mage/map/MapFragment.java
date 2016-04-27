@@ -53,6 +53,7 @@ import com.vividsolutions.jts.geom.Point;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -122,6 +123,7 @@ import mil.nga.giat.mage.sdk.event.IStaticFeatureEventListener;
 import mil.nga.giat.mage.sdk.exceptions.LayerException;
 import mil.nga.giat.mage.sdk.exceptions.UserException;
 import mil.nga.giat.mage.sdk.location.LocationService;
+import mil.nga.giat.mage.websocket.SensorWebSocket;
 import mil.nga.wkb.geom.GeometryType;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback, OnMapClickListener, OnMapLongClickListener, OnMarkerClickListener, OnInfoWindowClickListener, OnMapPanListener, OnMyLocationButtonClickListener, OnClickListener, LocationSource, LocationListener, OnCacheOverlayListener, OnSharedPreferenceChangeListener,
@@ -1023,6 +1025,153 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, OnMapCl
 	}
 
 	private void onSensorFeatureLayer(Layer layer) {
+		String sensorUrl = layer.getUrl();
+//		Example sensor URL: http://sensiasoft.net:8181/sensorhub/sos
+//				?service=SOS
+//				&version=2.0
+//				&request=GetResult
+//				&offering=urn:android:device:060693280a28e015-sos
+//				&observedProperty=
+//					http://sensorml.com/ont/swe/
+//					property/Location
+//					&temporalFilter=phenomenonTime,2015-02-16T07:58:00Z/2015-02-16T08:09:00Z
+//					&replaySpeed=5");
+
+// http://sensiasoft.net:8181/
+// &offering=urn:android:device:a0e0eac2fea3f614-sos
+// &observedProperty=http://sensorml.com/ont/swe/property/Location
+// &observedProperty=http://sensorml.com/ont/swe/property/VideoFrame
+// 		&temporalFilter=phenomenonTime,2016-04-25T21:16:36.731Z/2016-04-27T17:00:38Z
+// 		&replaySpeed=2
+
+		//Update the sensor URL
+
+		String [] tokens = StringUtils.split(sensorUrl, '&');
+		sensorUrl = tokens[0];
+		sensorUrl = sensorUrl.replaceFirst("http://","ws://");
+
+		String sensorOffering = tokens[1];
+		sensorUrl = sensorUrl + "sensorhub/sos?service=SOS&version=2.0&request=GetResult&" + sensorOffering;
+		sensorUrl = sensorUrl + "&" + tokens[2] + "&" + tokens[4] + "&" + tokens[5];
+
+		URI sensorUri = null;
+		try {
+			sensorUri =  URI.create(sensorUrl);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		SensorWebSocket sensorWebSocket = new SensorWebSocket(sensorUri, map);
+/*
+
+		public static void main(String[] args) {
+			System.out.println("Testutility to profile/test this implementation using the Autobahn suit.\n");
+			System.out.println("Type 'r <casenumber>' to run a testcase. Example: r 1");
+			System.out.println("Type 'r <first casenumber> <last casenumber>' to run a testcase. Example: r 1 295");
+			System.out.println("Type 'u' to update the test results.");
+			System.out.println("Type 'ex' to terminate the program.");
+			System.out.println("During sequences of cases the debugoutput will be turned of.");
+
+			System.out.println("You can now enter in your commands:");
+
+			try {
+				BufferedReader sysin = new BufferedReader(new InputStreamReader(System.in));
+
+				Draft d = new Draft_17();
+				String clientname = "tootallnate/websocket";
+
+				String protocol = "ws";
+				String host = "localhost";
+				int port = 9001;
+
+				String serverlocation = protocol + "://" + host + ":" + port;
+				String line = "";
+				AutobahnClientTest e;
+				URI uri = null;
+				String perviousline = "";
+				String nextline = null;
+				Integer start = null;
+				Integer end = null;
+
+				while (!line.contains("ex")) {
+					try {
+						if (nextline != null) {
+							line = nextline;
+							nextline = null;
+							WebSocketImpl.DEBUG = false;
+						} else {
+							System.out.print(">");
+							line = sysin.readLine();
+							WebSocketImpl.DEBUG = true;
+						}
+						if (line.equals("l")) {
+							line = perviousline;
+						}
+						String[] spl = line.split(" ");
+						if (line.startsWith("r")) {
+							if (spl.length == 3) {
+								start = new Integer(spl[1]);
+								end = new Integer(spl[2]);
+							}
+							if (start != null && end != null) {
+								if (start > end) {
+									start = null;
+									end = null;
+								} else {
+									nextline = "r " + start;
+									start++;
+									if (spl.length == 3)
+										continue;
+								}
+							}
+							uri = URI.create(serverlocation + "/runCase?case=" + spl[1] + "&agent=" + clientname);
+
+						} else if (line.startsWith("u")) {
+							WebSocketImpl.DEBUG = false;
+							uri = URI.create(serverlocation + "/updateReports?agent=" + clientname);
+						} else if (line.startsWith("d")) {
+							try {
+								d = (Draft) Class.forName("Draft_" + spl[1]).getConstructor().newInstance();
+							} catch (Exception ex) {
+								System.out.println("Could not change draft" + ex);
+							}
+						}
+						if (uri == null) {
+							System.out.println("Do not understand the input.");
+							continue;
+						}
+						System.out.println("//////////////////////Exec: " + uri.getQuery());
+						e = new AutobahnClientTest(d, uri);
+						Thread t = new Thread(e);
+						t.start();
+						try {
+							t.join();
+
+						} catch (InterruptedException e1) {
+							e1.printStackTrace();
+						} finally {
+							e.close();
+						}
+					} catch (ArrayIndexOutOfBoundsException e1) {
+						System.out.println("Bad Input r 1, u 1, d 10, ex");
+					} catch (IllegalArgumentException e2) {
+						e2.printStackTrace();
+					}
+
+				}
+			} catch (ArrayIndexOutOfBoundsException e) {
+				System.out.println("Missing server uri");
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+				System.out.println("URI should look like ws://localhost:8887 or wss://echo.websocket.org");
+			} catch (IOException e) {
+				e.printStackTrace(); // for System.in reader
+			}
+			System.exit(0);
+		}
+ */
+
+
 
 //		Set<String> layers = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getStringSet(getString(R.string.staticFeatureLayersKey), Collections.<String> emptySet());
 //
