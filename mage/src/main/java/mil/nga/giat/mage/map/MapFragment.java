@@ -980,7 +980,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, OnMapCl
 
 		try {
 			for (Layer l : LayerHelper.getInstance(getActivity().getApplicationContext()).readByEvent(EventHelper.getInstance(getActivity().getApplicationContext()).getCurrentEvent())) {
-				onStaticFeatureLayer(l);
+				if (l.getType().equals("Sensor")) {
+					onSensorFeatureLayer(l);
+				} else {
+					onStaticFeatureLayer(l);
+				}
 			}
 		} catch (LayerException e) {
 			Log.e(LOG_NAME, "Problem updating static features.", e);
@@ -1016,6 +1020,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, OnMapCl
 		if (layers.contains(layerId) && layer.isLoaded()) {
 			new StaticFeatureLoadTask(getActivity().getApplicationContext(), staticGeometryCollection, map).executeOnExecutor(executor, layer);
 		}
+	}
+
+	private void onSensorFeatureLayer(Layer layer) {
+
+//		Set<String> layers = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getStringSet(getString(R.string.staticFeatureLayersKey), Collections.<String> emptySet());
+//
+//		// The user has asked for this feature layer
+//		String layerId = layer.getId().toString();
+//		if (layers.contains(layerId) && layer.isLoaded()) {
+//			new StaticFeatureLoadTask(getActivity().getApplicationContext(), staticGeometryCollection, map).executeOnExecutor(executor, layer);
+//		}
 	}
 
 	private void updateMapView() {
