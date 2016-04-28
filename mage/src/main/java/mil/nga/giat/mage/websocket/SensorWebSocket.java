@@ -53,14 +53,6 @@ public class SensorWebSocket {
 
         this.webSocket = webSocket;
 
-        openSocket();
-    }
-
-    public void closeSocket() {
-        webSocket.close();
-    }
-
-    public void openSocket() {
         webSocket.setDataCallback(new DataCallback() {
             public void onDataAvailable(DataEmitter emitter, ByteBufferList byteBufferList) {
                 String[] results = StringUtils.split(byteBufferList.readString(), ",");
@@ -95,6 +87,10 @@ public class SensorWebSocket {
                 byteBufferList.recycle();
             }
         });
+    }
+
+    public void closeSocket() {
+        webSocket.close();
     }
 
 
