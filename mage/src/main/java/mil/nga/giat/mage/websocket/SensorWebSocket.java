@@ -1,58 +1,48 @@
 package mil.nga.giat.mage.websocket;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.koushikdutta.async.ByteBufferList;
+import com.koushikdutta.async.DataEmitter;
+import com.koushikdutta.async.callback.DataCallback;
+import com.koushikdutta.async.http.AsyncHttpClient;
+import com.koushikdutta.async.http.WebSocket;
 
-import org.java_websocket.WebSocket;
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.framing.FrameBuilder;
-import org.java_websocket.framing.Framedata;
-import org.java_websocket.handshake.ServerHandshake;
+import org.apache.commons.lang3.StringUtils;
 
 import java.net.URI;
-import java.nio.ByteBuffer;
 
-public class SensorWebSocket extends WebSocketClient {
+public class SensorWebSocket {
 
     GoogleMap map;
 
     public SensorWebSocket(URI uri, GoogleMap map) {
-        super(uri);
-        this.map = map;
+
+        AsyncHttpClient.getDefaultInstance().websocket(uri.toString(), "", new AsyncHttpClient.WebSocketConnectCallback() {
+
+            @Override
+            public void onCompleted(Exception ex, WebSocket webSocket) {
+                if (ex != null) {
+                    ex.printStackTrace();
+                    return;
+                }
+
+                webSocket.setDataCallback(new DataCallback() {
+                    public void onDataAvailable(DataEmitter emitter, ByteBufferList byteBufferList) {
+                        String[] results = StringUtils.split(byteBufferList.readString(), ",");
+                        String timestamp = results[0];
+                        double lat = Double.parseDouble(results[1]);
+                        double lng = Double.parseDouble(results[2]);
+                        double alt = Double.parseDouble(results[3]);
+
+                        // note that this data has been read
+                        byteBufferList.recycle();
+                    }
+                });
+            }
+        });
+
     }
 
-    @Override
-    public void onMessage(String message) {
-        System.out.println("onMesasge(String): " + message);
-       // send(message);
-    }
-
-    @Override
-    public void onMessage(ByteBuffer blob) {
-        System.out.println("onMessage(blob): " + blob.toString());
-        //getConnection().send(blob);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-        System.out.println("Error: ");
-        ex.printStackTrace();
-    }
-
-    @Override
-    public void onOpen(ServerHandshake handshake) {
-    }
-
-    @Override
-    public void onClose(int code, String reason, boolean remote) {
-        System.out.println("Closed: " + code + " " + reason);
-    }
-
-    @Override
-    public void onWebsocketMessageFragment(WebSocket conn, Framedata frame) {
-        FrameBuilder builder = (FrameBuilder) frame;
-        builder.setTransferemasked(true);
-        getConnection().sendFrame(frame);
-    }
 
 
 }
