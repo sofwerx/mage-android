@@ -89,6 +89,10 @@
             android:label="@string/app_name">
         </activity>
         <activity
+            android:name="mil.nga.giat.mage.websocket.SensorActivity"
+            android:label="@string/app_name">
+        </activity>
+        <activity
             android:name="mil.nga.giat.mage.LandingActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/app_name"
