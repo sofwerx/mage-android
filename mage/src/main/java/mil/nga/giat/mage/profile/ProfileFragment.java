@@ -172,7 +172,7 @@ public class ProfileFragment extends Fragment implements OnMapReadyCallback, OnC
 			phoneTextView.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					AlertDialog.Builder mBuilder = new AlertDialog.Builder(context);
+					AlertDialog.Builder mBuilder = new AlertDialog.Builder(getActivity());
 					mBuilder.setMessage("Do you want to call or text " + displayName + "?");
 					mBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
@@ -213,7 +213,7 @@ public class ProfileFragment extends Fragment implements OnMapReadyCallback, OnC
 			emailTextView.setOnClickListener(new OnClickListener() {
 				 @Override
 				 public void onClick(View v) {
-					 AlertDialog.Builder mBuilder = new AlertDialog.Builder(context);
+					 AlertDialog.Builder mBuilder = new AlertDialog.Builder(getActivity());
 					 mBuilder.setMessage("Do you want to email " + displayName + "?");
 					 mBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
 						 public void onClick(DialogInterface dialog, int id) {
