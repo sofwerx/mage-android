@@ -80,6 +80,8 @@ public class ProfileFragment extends Fragment implements OnMapReadyCallback, OnC
 	private static final int GALLERY_ACTIVITY_REQUEST_CODE = 200;
 	private static final int PERMISSIONS_REQUEST_CAMERA = 300;
 	private static final int PERMISSIONS_REQUEST_STORAGE = 400;
+	private static final int PERMISSIONS_REQUEST_PHONE = 500;
+
 
 	public static String USER_ID = "USER_ID";
 	
@@ -87,6 +89,7 @@ public class ProfileFragment extends Fragment implements OnMapReadyCallback, OnC
 	private User user;
 	
 	private MapView mapView;
+	private TextView phoneTextView;
 	private LatLng latLng = new LatLng(0, 0);
 	private float zoom = 0f;
 	private BitmapDescriptor icon;
@@ -161,7 +164,7 @@ public class ProfileFragment extends Fragment implements OnMapReadyCallback, OnC
 
 		final TextView realNameTextView = (TextView)rootView.findViewById(R.id.realName);
 		realNameTextView.setText(displayName);
-		final TextView phoneTextView = (TextView)rootView.findViewById(R.id.phone);
+		phoneTextView = (TextView)rootView.findViewById(R.id.phone);
 
 		rootView.findViewById(R.id.profile_picture).setOnClickListener(this);
 
@@ -181,14 +184,11 @@ public class ProfileFragment extends Fragment implements OnMapReadyCallback, OnC
 					});
 					mBuilder.setNeutralButton("Call", new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {
-						try {
-							Intent callIntent = new Intent(Intent.ACTION_CALL);
-							callIntent.setData(Uri.parse("tel:" + phoneTextView.getText().toString()));
-							startActivity(callIntent);
-						} catch (ActivityNotFoundException ae) {
-							Toast.makeText(getActivity(), "Could not call user.", Toast.LENGTH_SHORT).show();
-							Log.e(LOG_NAME, "Could not call user.", ae);
-						}
+							if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+								FragmentCompat.requestPermissions(ProfileFragment.this, new String[]{Manifest.permission.CALL_PHONE}, PERMISSIONS_REQUEST_PHONE);
+							} else {
+								launchCallIntent();
+							}
 						}
 					});
 					mBuilder.setPositiveButton("Text", new DialogInterface.OnClickListener() {
@@ -292,6 +292,17 @@ public class ProfileFragment extends Fragment implements OnMapReadyCallback, OnC
 
 		
 		return rootView;
+	}
+
+	private void launchCallIntent() {
+		try {
+			Intent callIntent = new Intent(Intent.ACTION_CALL);
+			callIntent.setData(Uri.parse("tel:" + phoneTextView.getText().toString()));
+			startActivity(callIntent);
+		} catch (ActivityNotFoundException ae) {
+			Toast.makeText(getActivity(), "Could not call user.", Toast.LENGTH_SHORT).show();
+			Log.e(LOG_NAME, "Could not call user.", ae);
+		}
 	}
 
 	@Override
@@ -414,6 +425,22 @@ public class ProfileFragment extends Fragment implements OnMapReadyCallback, OnC
 						showDisabledPermissionsDialog(
 								getResources().getString(R.string.gallery_access_title),
 								getResources().getString(R.string.gallery_access_message));
+					}
+				}
+
+				break;
+			}
+			case PERMISSIONS_REQUEST_PHONE: {
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					launchCallIntent();
+				} else {
+					if (!FragmentCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CALL_PHONE)) {
+						// User denied storage with never ask again.  Since they will get here
+						// by clicking the gallery button give them a dialog that will
+						// guide them to settings if they want to enable the permission
+						showDisabledPermissionsDialog(
+								getResources().getString(R.string.phone_access_title),
+								getResources().getString(R.string.phone_access_message));
 					}
 				}
 
