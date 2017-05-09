@@ -355,7 +355,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, OnMapCl
 		}
 		locations = new LocationMarkerCollection(getActivity(), map);
 		LocationLoadTask locationLoad = new LocationLoadTask(getActivity(), locations);
-		locationLoad.setFilter(getTemporalFilter("timestamp"));
+		locationLoad.setFilter(getTemporalLocationFilter("timestamp"));
 		locationLoad.executeOnExecutor(executor);
 
 		updateMapView();
@@ -600,7 +600,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, OnMapCl
 			if (currentUser != null && !currentUser.getRemoteId().equals(l.getUser().getRemoteId())) {
 				if (locations != null) {
 					LocationTask task = new LocationTask(LocationTask.Type.ADD, locations);
-					task.setFilter(getTemporalFilter("timestamp"));
+					task.setFilter(getTemporalLocationFilter("timestamp"));
 					task.executeOnExecutor(executor, l);
 				}
 			} else {
@@ -616,7 +616,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, OnMapCl
 		if (currentUser != null && !currentUser.getRemoteId().equals(l.getUser().getRemoteId())) {
 			if (locations != null) {
 				LocationTask task = new LocationTask(LocationTask.Type.UPDATE, locations);
-				task.setFilter(getTemporalFilter("timestamp"));
+				task.setFilter(getTemporalLocationFilter("timestamp"));
 				task.executeOnExecutor(executor, l);
 			}
 		} else {
@@ -1254,6 +1254,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, OnMapCl
 
 	private int getTimeFilterId() {
 		return preferences.getInt(getResources().getString(R.string.activeTimeFilterKey), getResources().getInteger(R.integer.time_filter_none));
+	}
+
+	private boolean getHideInactive() {
+		return preferences.getBoolean(getResources().getString(R.string.activeLocationFilterKey), false);
+	}
+
+	private Filter<Temporal> getTemporalLocationFilter(String columnName) {
+		if (getHideInactive()) {
+			Filter<Temporal> filter = null;
+			Calendar c = Calendar.getInstance();
+			c.set(Calendar.MINUTE, getResources().getInteger(R.integer.active_location_minutes));
+
+			filter = new DateTimeFilter(c.getTime(), null, columnName);
+			return filter;
+		} else {
+			return getTemporalFilter(columnName);
+		}
 	}
 
 	private Filter<Temporal> getTemporalFilter(String columnName) {

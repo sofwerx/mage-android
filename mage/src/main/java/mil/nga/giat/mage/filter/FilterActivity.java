@@ -23,6 +23,9 @@ public class FilterActivity extends AppCompatActivity implements CompoundButton.
     private Integer timeFilter = 0;
     private Integer activeTimeFilter = 0;
 
+    private CheckBox hideInactiveCheckbox;
+    private boolean hideInactivePeopleFilter = false;
+
     private CheckBox favoriteCheckBox;
     private boolean activeFavoriteFilter = false;
 
@@ -43,6 +46,7 @@ public class FilterActivity extends AppCompatActivity implements CompoundButton.
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         timeFilter = activeTimeFilter = preferences.getInt(getResources().getString(R.string.activeTimeFilterKey), getResources().getInteger(R.integer.time_filter_none));
+        hideInactivePeopleFilter = preferences.getBoolean(getResources().getString(R.string.activeLocationFilterKey), false);
         activeFavoriteFilter = preferences.getBoolean(getResources().getString(R.string.activeFavoritesFilterKey), false);
         activeImportantFilter = preferences.getBoolean(getResources().getString(R.string.activeImportantFilterKey), false);
 
@@ -86,6 +90,7 @@ public class FilterActivity extends AppCompatActivity implements CompoundButton.
             }
         });
 
+        hideInactiveCheckbox = (CheckBox) findViewById(R.id.active_people_checkbox);
         importantCheckBox = (CheckBox) findViewById(R.id.status_important);
         favoriteCheckBox = (CheckBox) findViewById(R.id.status_favorite);
 
@@ -96,6 +101,9 @@ public class FilterActivity extends AppCompatActivity implements CompoundButton.
         }
 
         ((RadioButton) view).setChecked(true);
+
+        boolean hideInactive = preferences.getBoolean(getResources().getString(R.string.activeLocationFilterKey), false);
+        hideInactiveCheckbox.setChecked(hideInactive);
 
         boolean favorite = preferences.getBoolean(getResources().getString(R.string.activeFavoritesFilterKey), false);
         favoriteCheckBox.setChecked(favorite);
@@ -135,7 +143,12 @@ public class FilterActivity extends AppCompatActivity implements CompoundButton.
         importantCheckBox.setChecked(!importantCheckBox.isChecked());
     }
 
+    public void onHideInactiveFilter(View view) {
+        hideInactiveCheckbox.setChecked(!hideInactiveCheckbox.isChecked());
+    }
+
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
         int filter = Integer.parseInt(buttonView.getTag().toString());
         ((RadioButton) findViewById(android.R.id.content).findViewWithTag(timeFilter.toString())).setChecked(false);
         timeFilter = filter;
@@ -148,6 +161,11 @@ public class FilterActivity extends AppCompatActivity implements CompoundButton.
         if (activeTimeFilter != timeFilter) {
             activeTimeFilter = timeFilter;
             editor.putInt(getResources().getString(R.string.activeTimeFilterKey), activeTimeFilter);
+        }
+
+        if (hideInactivePeopleFilter != hideInactiveCheckbox.isChecked()) {
+            hideInactivePeopleFilter = hideInactiveCheckbox.isChecked();
+            editor.putBoolean(getResources().getString(R.string.activeLocationFilterKey), hideInactivePeopleFilter);
         }
 
         if (activeFavoriteFilter != favoriteCheckBox.isChecked()) {

@@ -113,10 +113,9 @@
                 android:gravity="center_vertical"
                 android:layout_marginTop="3dip"
                 android:textColor="?attr/colorPrimary"
-                android:text="TIME FILTER (Observations and Locations)"
+                android:text="TIME (Observations and Locations)"
                 android:textSize="14sp"
                 android:fontFamily="sans-serif-medium" />
-
             <LinearLayout
                 android:id="@+id/none_time_filter"
                 android:clickable="true"
@@ -304,39 +303,60 @@
 
             </LinearLayout>
 
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dip"
+                android:background="#1FFFFFFF" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginStart="16dip"
+                android:gravity="center_vertical"
+                android:layout_marginTop="3dip"
+                android:textColor="?attr/colorPrimary"
+                android:text="PEOPLE LOCATIONS"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif-medium" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:onClick="onHideInactiveFilter"
+                android:background="?android:attr/selectableItemBackground">
+
+                <CheckBox
+                    android:id="@+id/active_people_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:clickable="false"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hide Inactive People"
+                        style="@style/ListTextPrimary" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hides people who have not reported a location in the last 30 minutes."
+                        style="@style/ListTextSecondary"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
         </LinearLayout>
 
-
     </ScrollView>
-
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="1dip"
-        android:background="#1FFFFFFF" />
-
-    <LinearLayout
-        style="?android:attr/buttonBarStyle"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal|end"
-        android:layout_gravity="end"
-        android:measureWithLargestChild="true"
-        android:orientation="horizontal"
-        android:paddingLeft="2dip"
-        android:paddingRight="2dip"
-        android:paddingTop="0dip">
-
-        <Button
-            android:id="@+id/filter_ok_btn"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="filterOkClick"
-            android:text="Filter"
-            android:textColor="#FFFFFF" />
-
-    </LinearLayout>
-
 
 </LinearLayout>

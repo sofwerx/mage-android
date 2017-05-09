@@ -192,6 +192,7 @@ public class ObservationFeedFragment extends Fragment implements IObservationEve
 		observationRefreshReceiver.register();
 
 		sp.registerOnSharedPreferenceChangeListener(this);
+		updateFilter();
 	}
 
 	@Override

@@ -13,4 +13,8 @@
     <integer name="time_filter_last_week">3</integer>
     <integer name="time_filter_last_month">4</integer>
 
+    <integer name="location_filter_all">5</integer>
+    <integer name="location_filter_active">6</integer>
+
+    <integer name="active_location_minutes">-30</integer>
 </resources>

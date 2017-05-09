@@ -102,7 +102,7 @@ public class PeopleFeedFragment extends Fragment implements OnSharedPreferenceCh
 
         try {
         	Dao<Location, Long> locationDao = DaoStore.getInstance(getActivity().getApplicationContext()).getLocationDao();
-            query = buildQuery(locationDao, getTimeFilterId());
+            query = buildQuery(locationDao, getTimeFilterId(), getHideInactive());
             Cursor c = obtainCursor(query, locationDao);
             adapter = new PeopleCursorAdapter(getActivity().getApplicationContext(), c, query);
             footer = (ViewGroup) inflater.inflate(R.layout.feed_footer, lv, false);
@@ -123,6 +123,7 @@ public class PeopleFeedFragment extends Fragment implements OnSharedPreferenceCh
         sp.registerOnSharedPreferenceChangeListener(this);
         LocationHelper.getInstance(getActivity()).addListener(this);
         locationRefreshReceiver.register();
+        updateTimeFilter(getTimeFilterId(), getHideInactive());
     }
 
     @Override
@@ -162,8 +163,8 @@ public class PeopleFeedFragment extends Fragment implements OnSharedPreferenceCh
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (getResources().getString(R.string.activeTimeFilterKey).equalsIgnoreCase(key)) {
-            updateTimeFilter(sharedPreferences.getInt(key, 0));
+        if (getResources().getString(R.string.activeTimeFilterKey).equalsIgnoreCase(key) || getResources().getString(R.string.activeLocationFilterKey).equalsIgnoreCase(key)) {
+            updateTimeFilter(getTimeFilterId(), getHideInactive());
         }
     }
 
@@ -174,6 +175,10 @@ public class PeopleFeedFragment extends Fragment implements OnSharedPreferenceCh
 
     private int getTimeFilterId() {
         return sp.getInt(getResources().getString(R.string.activeTimeFilterKey), getResources().getInteger(R.integer.time_filter_none));
+    }
+
+    private boolean getHideInactive() {
+        return sp.getBoolean(getResources().getString(R.string.activeLocationFilterKey), false);
     }
 
     private Cursor obtainCursor(PreparedQuery<Location> query, Dao<Location, Long> lDao) throws SQLException {
@@ -189,7 +194,7 @@ public class PeopleFeedFragment extends Fragment implements OnSharedPreferenceCh
             }
             queryUpdateHandle = scheduler.schedule(new Runnable() {
                 public void run() {
-                    updateTimeFilter(getTimeFilterId());
+                    updateTimeFilter(getTimeFilterId(), getHideInactive());
                 }
             }, 30*1000, TimeUnit.MILLISECONDS);
             c.moveToFirst();
@@ -197,13 +202,13 @@ public class PeopleFeedFragment extends Fragment implements OnSharedPreferenceCh
         return c;
     }
 
-    private void updateTimeFilter(final int filterId) {
+    private void updateTimeFilter(final int filterId, final boolean hideInactive) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
                 	Dao<Location, Long> locationDao = DaoStore.getInstance(getActivity().getApplicationContext()).getLocationDao();
-                    query = buildQuery(locationDao, filterId);
+                    query = buildQuery(locationDao, filterId, hideInactive);
                     adapter.changeCursor(obtainCursor(query, locationDao));
                 } catch (Exception e) {
                     Log.e(LOG_NAME, "Unable to change cursor", e);
@@ -212,7 +217,7 @@ public class PeopleFeedFragment extends Fragment implements OnSharedPreferenceCh
         });
     }
     
-    private PreparedQuery<Location> buildQuery(Dao<Location, Long> lDao, int filterId) throws SQLException {
+    private PreparedQuery<Location> buildQuery(Dao<Location, Long> lDao, int filterId, boolean hideInactive) throws SQLException {
         QueryBuilder<Location, Long> qb = lDao.queryBuilder();
         Calendar c = Calendar.getInstance();
 		String subtitle = "";
@@ -251,6 +256,11 @@ public class PeopleFeedFragment extends Fragment implements OnSharedPreferenceCh
 			e.printStackTrace();
 		}
 		Where<Location, Long> where = qb.where().gt("timestamp", c.getTime());
+        if (hideInactive) {
+            Calendar c2 = Calendar.getInstance();
+            c2.set(Calendar.MINUTE, getResources().getInteger(R.integer.active_location_minutes));
+            where.and().gt("timestamp", c2.getTime());
+        }
 		if (currentUser != null) {
 			where.and().ne("user_id", currentUser.getId()).and().eq("event_id", currentUser.getUserLocal().getCurrentEvent().getId());
 		}
@@ -289,17 +299,17 @@ public class PeopleFeedFragment extends Fragment implements OnSharedPreferenceCh
 
 	@Override
 	public void onLocationCreated(Collection<Location> location) {
-		updateTimeFilter(getTimeFilterId());
+		updateTimeFilter(getTimeFilterId(), getHideInactive());
 	}
 
 	@Override
 	public void onLocationUpdated(Location location) {
-		updateTimeFilter(getTimeFilterId());
+		updateTimeFilter(getTimeFilterId(), getHideInactive());
 	}
 
 	@Override
 	public void onLocationDeleted(Collection<Location> location) {
-		updateTimeFilter(getTimeFilterId());
+		updateTimeFilter(getTimeFilterId(), getHideInactive());
 	}
 
     public class LocationRefreshReceiver extends BroadcastReceiver {
