@@ -1,0 +1,3 @@
+[submodule "mage-android-sdk"]
+	path = mage-android-sdk
+	url = https://github.com/sofwerx/mage-android-sdk
