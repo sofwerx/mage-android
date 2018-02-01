@@ -17,7 +17,7 @@ after_success:
 branches:
   only:
   - master
-  - "/^v\\d.*$/"
+  - "/^v?\\d.*$/"
 deploy:
   provider: releases
   skip_cleanup: true
