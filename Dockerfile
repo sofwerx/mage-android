@@ -52,5 +52,4 @@ RUN ./gradlew build
 
 VOLUME /outputs/
 
-RUN cp -f ./mage/build/outputs/apk/mage-android-wear-debug.apk ./mage/build/outputs/apk/mage-android-defaults-debug.apk ./mage/build/outputs/apk/mage-android-wear-release-unsigned.apk ./mage/build/outputs/apk/mage-android-defaults-release-unsigned.apk /outputs/
-
+CMD cp -f ./mage/build/outputs/apk/mage-android-wear-debug.apk ./mage/build/outputs/apk/mage-android-defaults-debug.apk ./mage/build/outputs/apk/mage-android-wear-release-unsigned.apk ./mage/build/outputs/apk/mage-android-defaults-release-unsigned.apk /outputs/
