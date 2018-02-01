@@ -1,0 +1,34 @@
+sudo: required
+services:
+- docker
+language: bash
+script:
+- docker pull ${TRAVIS_REPO_SLUG}:latest || true
+- docker build --cache-from ${TRAVIS_REPO_SLUG}:latest -t ${TRAVIS_REPO_SLUG}:${TRAVIS_TAG:-latest} .
+after_success:
+- docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+- docker push ${TRAVIS_REPO_SLUG}:${TRAVIS_TAG:-latest} || true
+- mv outputs/mage-android-wear-debug.apk mage-android-wear-debug_${TRAVIS_TAG}.apk
+- mv outputs/mage-android-defaults-debug.apk mage-android-defaults-debug_${TRAVIS_TAG}.apk
+- mv outputs/mage-android-wear-release-unsigned.apk mage-android-wear-release-unsigned_${TRAVIS_TAG}.apk
+- mv outputs/mage-android-defaults-release-unsigned.apk mage-android-defaults-release-unsigned_${TRAVIS_TAG}.apk
+branches:
+  only:
+  - master
+  - "/^v\\d.*$/"
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key: "${GITHUB_TOKEN}"
+  file:
+  - mage-android-wear-debug_${TRAVIS_TAG}.apk
+  - mage-android-defaults-debug_${TRAVIS_TAG}.apk
+  - mage-android-wear-release-unsigned_${TRAVIS_TAG}.apk
+  - mage-android-defaults-release-unsigned_${TRAVIS_TAG}.apk
+  on:
+    tags: true
+    repo: "${TRAVIS_REPO_SLUG}"
+notifications:
+  slack:
+    rooms:
+      secure: GtEBKEBW5M27NSlFMC0NLm3yQEFB9pWTfyQl1Fa7ScF9THgWUaSE++2P1jD0LblpKn4fO7nDg1ZZoLdpVr2a3mY2rvk+rc4LPXKt4yyM30BFKKfgbY479Og99174/H4f2TsjKi4VjGOfp6Nk18lOgJ8CU3qKdq5pvzFQnHfn60T44wYMYqwCvIg5j8/Rz0SNPIsJbbSoj+uNSmj67G7q9bCcyg2OhLQXVMoZB6/nIjxeQnSSnuajeyw4zejRHnHC9uA8uCG52H69i9MjqCoCwzlFlsPLUKAOHJkQ18XytVvRKIptCcjZtIf1fB4YbRPU80gEjPA0caahR/LKx+Y8RsZPWjqG/f1Aqy8NTYnKui7KH/Tf1uOnTcPw3rML8s389riqPOQHZ7tytu3HfMb2QtdBpJaOZFYWm6269pvocPZ6n03v2aVvYAxGDow3dTkDJk8sHhxg+s3rKc0ydW7f8LcLIkRAOmb9D43BapN3C1sB/4yvUawy7ABuWsUBVX24S/Gm/dqNYSxFlhV0vPRndSTBzhTojsm+UfzwAG+6cu3bBMwgcU3kfAVQDB9IOxhD1jxpqu42Y1oT3Q/P/0DSwpV5+HMkOPxkbSynXMLZeN4BY/rWKvMpBxTkOoPb0fbpfIfUDSUQ5GoarC2mGwiuimWEOeGs/gyRki//VXhktZo=
