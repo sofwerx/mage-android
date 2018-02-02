@@ -9,10 +9,11 @@ script:
 after_success:
 - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 - docker push ${TRAVIS_REPO_SLUG}:${TRAVIS_TAG:-latest} || true
-- mv outputs/mage-android-wear-debug.apk mage-android-wear-debug_${TRAVIS_TAG}.apk
-- mv outputs/mage-android-defaults-debug.apk mage-android-defaults-debug_${TRAVIS_TAG}.apk
-- mv outputs/mage-android-wear-release-unsigned.apk mage-android-wear-release-unsigned_${TRAVIS_TAG}.apk
-- mv outputs/mage-android-defaults-release-unsigned.apk mage-android-defaults-release-unsigned_${TRAVIS_TAG}.apk
+- ls -la outputs/ .
+- cp outputs/mage-android-wear-debug.apk mage-android-wear-debug_${TRAVIS_TAG}.apk
+- cp outputs/mage-android-defaults-debug.apk mage-android-defaults-debug_${TRAVIS_TAG}.apk
+- cp outputs/mage-android-wear-release-unsigned.apk mage-android-wear-release-unsigned_${TRAVIS_TAG}.apk
+- cp outputs/mage-android-defaults-release-unsigned.apk mage-android-defaults-release-unsigned_${TRAVIS_TAG}.apk
 branches:
   only:
   - master
