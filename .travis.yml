@@ -12,8 +12,8 @@ after_success:
 - ls -la outputs/ .
 - cp outputs/mage-android-wear-debug.apk mage-android-wear-debug_${TRAVIS_TAG}.apk
 - cp outputs/mage-android-defaults-debug.apk mage-android-defaults-debug_${TRAVIS_TAG}.apk
-- cp outputs/mage-android-wear-release-unsigned.apk mage-android-wear-release-unsigned_${TRAVIS_TAG}.apk
-- cp outputs/mage-android-defaults-release-unsigned.apk mage-android-defaults-release-unsigned_${TRAVIS_TAG}.apk
+#- cp outputs/mage-android-wear-release-unsigned.apk mage-android-wear-release-unsigned_${TRAVIS_TAG}.apk
+#- cp outputs/mage-android-defaults-release-unsigned.apk mage-android-defaults-release-unsigned_${TRAVIS_TAG}.apk
 branches:
   only:
   - master
@@ -25,8 +25,8 @@ deploy:
   file:
   - mage-android-wear-debug_${TRAVIS_TAG}.apk
   - mage-android-defaults-debug_${TRAVIS_TAG}.apk
-  - mage-android-wear-release-unsigned_${TRAVIS_TAG}.apk
-  - mage-android-defaults-release-unsigned_${TRAVIS_TAG}.apk
+#  - mage-android-wear-release-unsigned_${TRAVIS_TAG}.apk
+#  - mage-android-defaults-release-unsigned_${TRAVIS_TAG}.apk
   on:
     tags: true
     repo: "${TRAVIS_REPO_SLUG}"
