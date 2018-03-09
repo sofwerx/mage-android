@@ -3,22 +3,36 @@ All notable changes to this project will be documented in this file.
 Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
-## 6.0.3 (TBD)
+## 6.0.4 (TBD)
 
 * TBD
 
 ##### Features
 
 ##### Bug Fixes
+* Fix crash when trying to edit observation location 
+* Fix observation and location time filtering
+* Fix observation and location info window click crash
+* Fix map layout height in profile view
 
-## [6.0.2](https://github.com/ngageoint/mage-android/releases/tag/6.0.2) (01-25-2017)
+## [6.0.3](https://github.com/ngageoint/mage-android/releases/tag/6.0.3) (02-14-2018)
+
+##### Features
+
+##### Bug Fixes
+* Don't show archived forms in form selection activity
+* Prevent crash if no location when clicking zoom to location
+* Clean up MapFragment memory leaks
+* Prevent crash on logout due to no current event
+
+## [6.0.2](https://github.com/ngageoint/mage-android/releases/tag/6.0.2) (01-25-2018)
 
 ##### Features
 
 ##### Bug Fixes
 * Perform initial fetch before events screen.  This will ensure all data is available before we hit the landing activity
 
-## [6.0.1](https://github.com/ngageoint/mage-android/releases/tag/6.0.1) (01-23-2017)
+## [6.0.1](https://github.com/ngageoint/mage-android/releases/tag/6.0.1) (01-23-2018)
 
 ##### Features
 
@@ -26,7 +40,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * Fix layout for event title in event loading activity
 * Pull in all events when getting events for the current user
 
-## [6.0.0](https://github.com/ngageoint/mage-android/releases/tag/6.0.0) (01-15-2017)
+## [6.0.0](https://github.com/ngageoint/mage-android/releases/tag/6.0.0) (01-15-2018)
 
 ##### Features
 * Observation geometry support for lines and polygons
