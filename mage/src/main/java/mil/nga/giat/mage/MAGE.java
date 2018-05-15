@@ -13,9 +13,11 @@ import android.preference.PreferenceManager;
 import android.support.multidex.MultiDexApplication;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 
 import mil.nga.giat.mage.login.LoginActivity;
+import mil.nga.giat.mage.login.OAuthActivity;
 import mil.nga.giat.mage.login.ServerUrlActivity;
 import mil.nga.giat.mage.login.SignupActivity;
 import mil.nga.giat.mage.observation.ObservationNotificationListener;
@@ -68,6 +70,10 @@ public class MAGE extends MultiDexApplication implements ISessionEventListener, 
 		HttpClientManager.getInstance(getApplicationContext()).addListener(this);
 
 		registerActivityLifecycleCallbacks(this);
+
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		int dayNightTheme = preferences.getInt(getResources().getString(R.string.dayNightThemeKey), getResources().getInteger(R.integer.dayNightThemeDefaultValue));
+		AppCompatDelegate.setDefaultNightMode(dayNightTheme);
 
 		super.onCreate();
 	}
@@ -322,6 +328,7 @@ public class MAGE extends MultiDexApplication implements ISessionEventListener, 
 
 		if (runningActivity != null &&
 				!(runningActivity instanceof LoginActivity) &&
+				!(runningActivity instanceof OAuthActivity) &&
 				!(runningActivity instanceof SignupActivity) &&
 				!(runningActivity instanceof ServerUrlActivity)) {
 			forceLogin(true);
@@ -343,6 +350,7 @@ public class MAGE extends MultiDexApplication implements ISessionEventListener, 
 
 		if (UserUtility.getInstance(getApplicationContext()).isTokenExpired() &&
 				!(activity instanceof LoginActivity) &&
+				!(activity instanceof OAuthActivity) &&
 				!(activity instanceof SignupActivity) &&
 				!(activity instanceof ServerUrlActivity)) {
 			forceLogin(false);
